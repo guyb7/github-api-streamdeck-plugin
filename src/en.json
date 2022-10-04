@@ -1,0 +1,8 @@
+{
+  "Name": "GitHub API", 
+  "Description": "Show data from GitHub", 
+  "com.github.guyb7.github-api-streamdeck-plugin": {
+    "Name": "GitHub API", 
+    "Tooltip": "Show data from GitHub"
+  }
+}

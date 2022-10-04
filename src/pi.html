@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>GitHub API PI</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="./common/css/sdpi.css" />
+    <link rel="stylesheet" href="./common/css/local.css" />
+  </head>
+
+  <body>
+    <div class="sdpi-wrapper hidden">
+      <div class="sdpi-heading">Query</div>
+      <div class="sdpi-item">
+        <div class="sdpi-item-label">
+          <a
+            data-open-url="https://github.com/settings/tokens"
+            href="https://github.com/settings/tokens"
+            target="_blank"
+            >GitHub Access Token</a
+          >
+        </div>
+        <input id="access_token" class="sdpi-item-value" type="password" />
+      </div>
+      <div type="textarea" class="sdpi-item alignTop">
+        <div class="sdpi-item-label">
+          <a
+            data-open-url="https://docs.github.com/en/graphql/overview/explorer"
+            href="https://docs.github.com/en/graphql/overview/explorer"
+            target="_blank"
+            >GraphQL Query</a
+          >
+        </div>
+        <span class="sdpi-item-value textarea">
+          <textarea id="graphql_query" type="textarea" rows="6"></textarea>
+        </span>
+      </div>
+      <div type="textarea" class="sdpi-item alignTop">
+        <div class="sdpi-item-label">Presets</div>
+        <select class="select" id="presets">
+          <option value="">Use a preset</option>
+          <option value="prs_to_review">Pull requests to review</option>
+        </select>
+      </div>
+      <div>* Choosing a preset will override your existing settings</div>
+
+      <div class="sdpi-heading">Badge</div>
+      <div type="textarea" class="sdpi-item alignTop">
+        <div class="sdpi-item-label">Value path</div>
+        <input id="badge_value_path" class="sdpi-item-value" type="text" />
+      </div>
+      <div type="textarea" class="sdpi-item alignTop">
+        <div class="sdpi-item-label">Show condition</div>
+        <input id="badge_show_condition" class="sdpi-item-value" type="text" />
+      </div>
+
+      <div class="sdpi-heading">Status Colors</div>
+      <div type="textarea" class="sdpi-item alignTop">
+        <div class="sdpi-item-label">Value path</div>
+        <input id="status_value_path" class="sdpi-item-value" type="text" />
+      </div>
+      <div type="textarea" class="sdpi-item alignTop">
+        <div class="sdpi-item-label">Colors dictionary</div>
+        <span class="sdpi-item-value textarea">
+          <textarea id="status_colors" type="textarea" rows="6"></textarea>
+        </span>
+      </div>
+
+      <div class="sdpi-heading">On Press</div>
+      <div type="textarea" class="sdpi-item alignTop">
+        <div class="sdpi-item-label">Behavior</div>
+        <select class="sdpi-item-value select" id="on_key_press">
+          <option value="refetch" selected>Re-fetch data</option>
+          <option value="open_first_url">Open First URL</option>
+          <option value="open_all_urls">Open All URLs</option>
+        </select>
+      </div>
+    </div>
+
+    <script src="./common/common_pi.js"></script>
+    <script src="./common/common.js"></script>
+    <script src="./pi.js"></script>
+  </body>
+</html>
