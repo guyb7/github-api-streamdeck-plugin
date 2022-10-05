@@ -54,6 +54,41 @@ function getPreset(preset) {
   "0": "#666666"
 }`,
       on_key_press: 'open_all_urls'
+    },
+    repo_status: {
+      graphql_query: `{
+  repository(owner: "facebook", name: "react") {
+    defaultBranchRef {
+      target {
+        ... on Commit {
+          id
+          status {
+            state
+          }
+          message
+          associatedPullRequests(first: 1) {
+            nodes {
+              url
+            }
+          }
+        }
+      }
+    }
+  }
+}`,
+      badge_value_path: '',
+      badge_show_condition: '=== "never"',
+      status_value_path: 'repository.defaultBranchRef.target.status.state',
+      status_colors: `{
+  "default": "#666666",
+  "error": "#ff3333",
+  "SUCCESS": "#336633",
+  "EXPECTED": "#336633",
+  "PENDING": "#aa9900",
+  "FAILURE": "#ff3333",
+  "ERROR": "#ff3333"
+}`,
+      on_key_press: 'open_first_url'
     }
   }
   return presets[preset]

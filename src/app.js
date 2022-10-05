@@ -114,23 +114,19 @@ async function sendQuery() {
       console.info(`Badge value: "${badgeText}" (${settings.badge_value_path})`)
       console.info(`Status value: "${statusText}" (${settings.status_value_path})`)
       console.info('Status colors', settings.status_colors, statusColor)
-      if (badgeText) {
-        let should_show_badge = true
-        if (settings.badge_show_condition) {
-          try {
-            should_show_badge = eval(
-              `${JSON.stringify(badgeText)} ${settings.badge_show_condition};`
-            )
-            console.info(
-              `Should show badge (${JSON.stringify(badgeText)} ${settings.badge_show_condition})`,
-              should_show_badge
-            )
-          } catch (e) {
-            console.error('Failed to evaluate badge condition')
-          }
+      let should_show_badge = badgeText.length > 0
+      if (settings.badge_show_condition) {
+        try {
+          should_show_badge = eval(`${JSON.stringify(badgeText)} ${settings.badge_show_condition};`)
+          console.info(
+            `Should show badge (${JSON.stringify(badgeText)} ${settings.badge_show_condition})`,
+            should_show_badge
+          )
+        } catch (e) {
+          console.error('Failed to evaluate badge condition')
         }
-        Canvas.set({ badgeText: should_show_badge ? badgeText : '', bgColor: '' + statusColor })
       }
+      Canvas.set({ badgeText: should_show_badge ? badgeText : '', bgColor: '' + statusColor })
     } catch (e) {
       console.error(e)
       const errorColor = _get(settings.status_colors, 'error', DEFAULT_BG_COLOR_ERROR)

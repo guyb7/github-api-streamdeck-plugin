@@ -71,6 +71,10 @@ Shows the number of pull requests you were requested to review. If you have at l
 
 Shows the number of open pull requests you're the author of. If you have at least 1 failing PR, the background will be yellow. Pressing the button will open the first 5 PRs.
 
+### Repository status
+
+Shows the status of the last commit on the default branch of a repository (edit the repo owner/name fields in the query). The background will be red on error/failure, yellow on pending, and green on success/expected. Pressing the button will open the first associated PR of the commit.
+
 ## Development
 
 1. Create a symlink from the `dist/` directory to the plugins directory:
