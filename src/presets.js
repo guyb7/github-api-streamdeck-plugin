@@ -100,7 +100,9 @@ export function onPresetSelect(e, settings, populateSettingsFn) {
   console.log('onPresetSelect', presetId, preset)
   if (preset) {
     populateSettingsFn({ ...preset, presets: '' })
-    settings = { ...settings, ...preset }
+    for (const k in preset) {
+        settings[k] = preset[k]
+    }
     $SD.api.setSettings($SD.uuid, settings)
   }
 }
