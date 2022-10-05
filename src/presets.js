@@ -1,15 +1,10 @@
 /* global $SD */
 
-import { getCurrentUser } from './GitHub'
-
 function getPreset(preset) {
-  const user = getCurrentUser()
   const presets = {
     prs_to_review: {
       graphql_query: `{
-  search(query: "type:pr state:open ${
-    user ? 'review-requested:' + user : ''
-  }", type: ISSUE, first: 5) {
+  prsToReview: search(query: "type:pr review-requested:@me state:open", type: ISSUE, first: 5) {
     issueCount
     edges {
       node {
@@ -21,9 +16,38 @@ function getPreset(preset) {
     }
   }
 }`,
-      badge_value_path: 'search.issueCount',
+      badge_value_path: 'prsToReview.issueCount',
       badge_show_condition: '!== "0"',
-      status_value_path: 'search.issueCount',
+      status_value_path: 'prsToReview.issueCount',
+      status_colors: `{
+  "default": "#aa9900",
+  "error": "#ff3333",
+  "0": "#666666"
+}`,
+      on_key_press: 'open_all_urls'
+    },
+    my_prs: {
+      graphql_query: `{
+  myOpenPrs: search(query: "type:pr author:@me is:open", type: ISSUE, first: 5) {
+    issueCount
+      edges {
+        node {
+          ... on PullRequest {
+          title
+          mergeable
+          state
+          url
+        }
+      }
+    }
+  }
+  openPrsWithError: search(query: "type:pr author:@me is:open status:failure", type: ISSUE) {
+    issueCount
+  }
+}`,
+      badge_value_path: 'myOpenPrs.issueCount',
+      badge_show_condition: '!== "0"',
+      status_value_path: 'openPrsWithError.issueCount',
       status_colors: `{
   "default": "#aa9900",
   "error": "#ff3333",

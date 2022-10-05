@@ -61,6 +61,16 @@ What should happen after pressing the Stream Deck button:
 - `Open First URL` will find the first URL value in the response and open it in your browser
 - `Open All URLs` will open all URL values in the response in your browser
 
+## Presets
+
+### Pull requests to review
+
+Shows the number of pull requests you were requested to review. If you have at least 1 PR, the background will be yellow. Pressing the button will open the first 5 PRs.
+
+### My pull requests
+
+Shows the number of open pull requests you're the author of. If you have at least 1 failing PR, the background will be yellow. Pressing the button will open the first 5 PRs.
+
 ## Development
 
 1. Create a symlink from the `dist/` directory to the plugins directory:
