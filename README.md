@@ -67,13 +67,19 @@ What should happen after pressing the Stream Deck button:
 
 Shows the number of pull requests you were requested to review. If you have at least 1 PR, the background will be yellow. Pressing the button will open the first 5 PRs.
 
+![crs](https://user-images.githubusercontent.com/3589252/194178900-5dd09090-5b81-4704-878a-57ad515c222a.png)
+
 ### My pull requests
 
 Shows the number of open pull requests you're the author of. If you have at least 1 failing PR, the background will be yellow. Pressing the button will open the first 5 PRs.
 
+![prs](https://user-images.githubusercontent.com/3589252/194178838-e419af31-6477-4172-8e8b-615963da7a59.png)
+
 ### Repository status
 
 Shows the status of the last commit on the default branch of a repository (edit the repo owner/name fields in the query). The background will be red on error/failure, yellow on pending, and green on success/expected. Pressing the button will open the first associated PR of the commit.
+
+![status](https://user-images.githubusercontent.com/3589252/194178868-0b09dea2-56cf-48c8-978a-b36d37d8bbb9.png)
 
 ## Development
 
