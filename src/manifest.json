@@ -15,7 +15,9 @@
       "UUID": "github-api-streamdeck-plugin"
     }
   ],
-  "Version": "0.0.1",
+  "Category": "GitHub",
+  "CategoryIcon": "images/github_category_icon",
+  "Version": "0.1.0",
   "SDKVersion": 2,
   "OS": [
     { "Platform": "mac", "MinimumVersion": "10.11" },
