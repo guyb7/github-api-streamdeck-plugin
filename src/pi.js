@@ -9,6 +9,7 @@ const onchangeevt = 'onchange' // oninput, onchange
 let sdpiWrapper = document.querySelector('.sdpi-wrapper')
 let settings = {}
 let context
+let github
 
 $SD.on('connected', info => {
   console.info('connected', info)
@@ -23,7 +24,7 @@ $SD.on('didReceiveSettings', jsonObj => {
   if (jsonObj && jsonObj.payload && jsonObj.payload.settings) {
     settings = jsonObj.payload.settings
     populateSettings(settings)
-    GitHub.init(settings.access_token)
+    github = new GitHub(settings.access_token)
   }
 
   revealSdpiWrapper()
@@ -295,6 +296,6 @@ function handleSdpiItemChange(e, idx) {
   if ($SD && $SD.connection) {
     console.log('setSettings(): ', settings)
     $SD.api.setSettings($SD.uuid, settings)
-    GitHub.init(settings.access_token)
+    github = new GitHub(settings.access_token)
   }
 }

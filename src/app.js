@@ -14,18 +14,8 @@ $SD.on(`${PLUGIN_ID}.didReceiveSettings`, onDidReceiveSettings)
 $SD.on(`${PLUGIN_ID}.willAppear`, onWillAppear)
 $SD.on(`${PLUGIN_ID}.keyDown`, onKeyDown)
 
-let context
-const settings = {
-  access_token: null,
-  graphql_query: null,
-  badge_value_path: null,
-  badge_show_condition: null,
-  status_value_path: null,
-  status_colors: null,
-  on_key_press: 'refetch' // refetch, open_first_url, open_all_urls
-}
-
-let last_response
+// key: context, value: state (settings, github, canvas)
+const contextState = {}
 
 function onConnected(json) {
   console.info('onConnected', json)
@@ -33,39 +23,60 @@ function onConnected(json) {
 
 function onDidReceiveSettings(json) {
   console.info('onDidReceiveSettings', json)
-  setSettings(json.payload.settings)
-  sendQuery()
+  setSettings(json.context, json.payload.settings)
+  sendQuery(json.context)
 }
 
 function onWillAppear(json) {
   console.info('onWillAppear', json)
-  context = json.context
-  setSettings(json.payload.settings)
-  Canvas.init(context)
-  sendQuery()
-  setInterval(sendQuery, FETCH_INTERVAL * 1000)
+  const context = json.context
+  setSettings(context, json.payload.settings)
+  contextState[context].canvas = new Canvas(context)
+  sendQuery(context)
+  setInterval(() => {
+    sendQuery(context)
+  }, FETCH_INTERVAL * 1000)
 }
 
 function onKeyDown(json) {
+  const context = json.context
+  const settings = contextState[context].settings
   console.info('onKeyDown', json, settings.on_key_press)
   switch (settings.on_key_press) {
     case 'open_first_url':
-      findAndOpenUrls(true)
+      findAndOpenUrls(context, true)
       return
     case 'open_all_urls':
-      findAndOpenUrls()
+      findAndOpenUrls(context)
       return
     case 'refetch':
     default:
-      sendQuery()
+      sendQuery(context)
   }
 }
 
-function setSettings(newSettings) {
+function setSettings(context, newSettings) {
+  if (!contextState[context]) {
+    contextState[context] = {
+      settings: {},
+      github: null,
+      canvas: null
+    }
+  }
+  contextState[context].settings = {
+    access_token: null,
+    graphql_query: null,
+    badge_value_path: null,
+    badge_show_condition: null,
+    status_value_path: null,
+    status_colors: null,
+    on_key_press: 'refetch' // refetch, open_first_url, open_all_urls
+  }
+  const settings = contextState[context].settings
   if (newSettings) {
     if (newSettings.access_token !== settings.access_token) {
       settings.access_token = newSettings.access_token
-      GitHub.init(newSettings.access_token)
+      contextState[context].github = new GitHub(settings.access_token)
     }
     if (newSettings.graphql_query !== settings.graphql_query) {
       settings.graphql_query = newSettings.graphql_query
@@ -98,10 +109,14 @@ function setSettings(newSettings) {
   }
 }
 
-async function sendQuery() {
+async function sendQuery(context) {
+  if (!contextState[context]) {
+    return
+  }
+  const settings = contextState[context].settings
   if (settings.graphql_query) {
     try {
-      last_response = await GitHub.query(settings.graphql_query)
+      const last_response = await contextState[context].github.query(settings.graphql_query)
       const currentTime = new Date().toLocaleString()
       console.info('GraphQL response', last_response, currentTime)
       const badgeText = '' + _get(last_response, settings.badge_value_path, '')
@@ -126,16 +141,22 @@ async function sendQuery() {
           console.error('Failed to evaluate badge condition')
         }
       }
-      Canvas.set({ badgeText: should_show_badge ? badgeText : '', bgColor: '' + statusColor })
+      contextState[context].canvas.set({
+        badgeText: should_show_badge ? badgeText : '',
+        bgColor: '' + statusColor
+      })
     } catch (e) {
       console.error(e)
       const errorColor = _get(settings.status_colors, 'error', DEFAULT_BG_COLOR_ERROR)
-      Canvas.set({ badgeText: '', bgColor: '' + errorColor })
+      contextState[context].canvas.set({ badgeText: '', bgColor: '' + errorColor })
     }
   }
 }
 
-function findAndOpenUrls(first_only = false, obj = last_response) {
+function findAndOpenUrls(context, first_only = false, obj) {
+  if (!obj) {
+    obj = contextState[context].github.getLastResponse()
+  }
   for (const v in obj) {
     if (typeof obj[v] === 'string') {
       if (IS_URL_REGEX.test(obj[v])) {
@@ -145,7 +166,7 @@ function findAndOpenUrls(first_only = false, obj = last_response) {
         }
       }
     } else if (typeof obj[v] === 'object') {
-      const foundUrl = findAndOpenUrls(first_only, obj[v])
+      const foundUrl = findAndOpenUrls(context, first_only, obj[v])
       if (foundUrl) {
         return true
       }
