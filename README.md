@@ -102,3 +102,10 @@ To debug:
 1. Run `defaults write com.elgato.StreamDeck html_remote_debugging_enabled -bool YES`
 2. Reload the Stream Deck application
 3. Open [http://localhost:23654/](http://localhost:23654/)
+
+## Publish
+
+1. Bump version
+2. `cd ~/Library/Application Support/com.elgato.StreamDeck/Plugins`
+3. `./DistributionTool -b -i com.github.guyb7.github-api-streamdeck-plugin.sdPlugin -o ~/Desktop`
+4. Email `streamdeck.elgato@corsair.com` with release notes
