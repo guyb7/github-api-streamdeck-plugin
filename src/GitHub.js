@@ -6,8 +6,11 @@ export default class GitHub {
   octokit
   lastResponse = null
 
-  constructor(access_token) {
-    this.octokit = new Octokit({ auth: access_token })
+  constructor(access_token, host = "https://github.com/api/v3") {
+    this.octokit = new Octokit({ 
+      baseUrl: host,
+      auth: access_token 
+    })
     this.init()
   }
 

@@ -24,7 +24,7 @@ $SD.on('didReceiveSettings', jsonObj => {
   if (jsonObj && jsonObj.payload && jsonObj.payload.settings) {
     settings = jsonObj.payload.settings
     populateSettings(settings)
-    github = new GitHub(settings.access_token)
+    github = new GitHub(settings.access_token, settings.host)
   }
 
   revealSdpiWrapper()
@@ -296,6 +296,6 @@ function handleSdpiItemChange(e, idx) {
   if ($SD && $SD.connection) {
     console.log('setSettings(): ', settings)
     $SD.api.setSettings($SD.uuid, settings)
-    github = new GitHub(settings.access_token)
+    github = new GitHub(settings.access_token, settings.host)
   }
 }
