@@ -5,7 +5,7 @@ import GitHub from './GitHub'
 
 const PLUGIN_ID = 'github-api-streamdeck-plugin'
 const IS_URL_REGEX = new RegExp('^https?://.+')
-const FETCH_INTERVAL = 120
+const FETCH_INTERVAL = 60
 const DEFAULT_BG_COLOR = '#cccccc'
 const DEFAULT_BG_COLOR_ERROR = '#ff0000'
 
@@ -31,7 +31,7 @@ function onDidReceiveSettings(json) {
 function onWillDisappear(json) {
   console.info('onWillDisappear', json)
   const context = json.context
-  clearInterval(contextState[context].intervalID)
+  clearInterval(contextState[context].intervalId)
 }
 
 function onWillAppear(json) {
@@ -40,12 +40,11 @@ function onWillAppear(json) {
   setSettings(context, json.payload.settings)
   contextState[context].canvas = new Canvas(context)
   sendQuery(context)
-  contextState[context].intervalID = setInterval(sendQuery, FETCH_INTERVAL * 1000, context)
+  contextState[context].intervalId = setInterval(sendQuery, FETCH_INTERVAL * 1000, context)
 
 }
 
 function onKeyDown(json) {
-  console.log('onKeyDown', json);
   const context = json.context
   const settings = contextState[context].settings
   console.info('onKeyDown', json, settings.on_key_press)
