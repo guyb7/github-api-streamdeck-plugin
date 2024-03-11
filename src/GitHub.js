@@ -1,13 +1,28 @@
 import { Octokit } from 'octokit'
 
+function emptyString(str) {
+  return !str || str.length === 0;
+}
+
+function blankString(str) {
+  return !str || /^\s*$/.test(str);
+}
+
+function isNonValidHost(host) {
+  return emptyString(host) || blankString(host);
+}
+
 export default class GitHub {
   isInitialized = false
   user = null
   octokit
   lastResponse = null
 
-  constructor(access_token) {
-    this.octokit = new Octokit({ auth: access_token })
+  constructor(access_token, host) {
+    this.octokit = new Octokit({ 
+      baseUrl: isNonValidHost(host) ? undefined : host,
+      auth: access_token 
+    })
     this.init()
   }
 

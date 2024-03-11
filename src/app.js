@@ -13,6 +13,7 @@ $SD.on('connected', onConnected)
 $SD.on(`${PLUGIN_ID}.didReceiveSettings`, onDidReceiveSettings)
 $SD.on(`${PLUGIN_ID}.willAppear`, onWillAppear)
 $SD.on(`${PLUGIN_ID}.keyDown`, onKeyDown)
+$SD.on(`${PLUGIN_ID}.willDisappear`, onWillDisappear)
 
 // key: context, value: state (settings, github, canvas)
 const contextState = {}
@@ -27,15 +28,20 @@ function onDidReceiveSettings(json) {
   sendQuery(json.context)
 }
 
+function onWillDisappear(json) {
+  console.info('onWillDisappear', json)
+  const context = json.context
+  clearInterval(contextState[context].intervalId)
+}
+
 function onWillAppear(json) {
   console.info('onWillAppear', json)
   const context = json.context
   setSettings(context, json.payload.settings)
   contextState[context].canvas = new Canvas(context)
   sendQuery(context)
-  setInterval(() => {
-    sendQuery(context)
-  }, FETCH_INTERVAL * 1000)
+  contextState[context].intervalId = setInterval(sendQuery, FETCH_INTERVAL * 1000, context)
+
 }
 
 function onKeyDown(json) {
@@ -65,6 +71,7 @@ function setSettings(context, newSettings) {
   }
   contextState[context].settings = {
     access_token: null,
+    host: null,
     graphql_query: null,
     badge_value_path: null,
     badge_show_condition: null,
@@ -74,9 +81,11 @@ function setSettings(context, newSettings) {
   }
   const settings = contextState[context].settings
   if (newSettings) {
-    if (newSettings.access_token !== settings.access_token) {
+    if ((newSettings.access_token !== settings.access_token)
+      || (newSettings.host !== settings.host)) {
       settings.access_token = newSettings.access_token
-      contextState[context].github = new GitHub(settings.access_token)
+      settings.host = newSettings.host
+      contextState[context].github = new GitHub(settings.access_token, settings.host)
     }
     if (newSettings.graphql_query !== settings.graphql_query) {
       settings.graphql_query = newSettings.graphql_query
@@ -110,6 +119,7 @@ function setSettings(context, newSettings) {
 }
 
 async function sendQuery(context) {
+  console.log('sendQuery', context);
   if (!contextState[context]) {
     return
   }
@@ -154,23 +164,31 @@ async function sendQuery(context) {
 }
 
 function findAndOpenUrls(context, first_only = false, obj) {
-  if (!obj) {
-    obj = contextState[context].github.getLastResponse()
-  }
-  for (const v in obj) {
-    if (typeof obj[v] === 'string') {
-      if (IS_URL_REGEX.test(obj[v])) {
-        $SD.api.openUrl(context, obj[v])
-        if (first_only) {
+  console.log('findAndOpenUrls', context, first_only, obj)
+  try {
+    if (!obj) {
+      obj = contextState[context].github.getLastResponse()
+    }
+    for (const v in obj) {
+      if (typeof obj[v] === 'string') {
+        if (IS_URL_REGEX.test(obj[v])) {
+          $SD.api.openUrl(context, obj[v])
+          if (first_only) {
+            return true
+          }
+        }
+      } else if (typeof obj[v] === 'object') {
+        const foundUrl = findAndOpenUrls(context, first_only, obj[v])
+        if (foundUrl) {
           return true
         }
       }
-    } else if (typeof obj[v] === 'object') {
-      const foundUrl = findAndOpenUrls(context, first_only, obj[v])
-      if (foundUrl) {
-        return true
-      }
     }
+    return false
+  } catch (e) {
+    console.error(e)
+    const settings = contextState[context].settings
+    const errorColor = _get(settings.status_colors, 'error', DEFAULT_BG_COLOR_ERROR)
+    contextState[context].canvas.set({ badgeText: '', bgColor: '' + errorColor })
   }
-  return false
 }
